@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HarmonyFox 起始页</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #1c1b22;
+    color: #f2f2f7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, sans-serif;
+    padding: 24px;
+  }
+  h1 { font-size: 32px; margin-bottom: 8px; }
+  h1 span { color: #e65f17; }
+  form { width: 100%; max-width: 480px; margin-top: 24px; display: flex; gap: 8px; }
+  input {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 22px;
+    padding: 0 18px;
+    font-size: 15px;
+    background: #3b3a41;
+    color: #f2f2f7;
+    outline: none;
+  }
+  button {
+    height: 44px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 22px;
+    font-size: 15px;
+    background: #e65f17;
+    color: #fff;
+  }
+  .tip { margin-top: 32px; font-size: 12px; color: #9a9aa3; }
+</style>
+</head>
+<body>
+  <h1>Harmony<span>Fox</span></h1>
+  <form action="https://www.bing.com/search" method="get">
+    <input type="text" name="q" placeholder="搜索网页..." autofocus>
+    <button type="submit">搜索</button>
+  </form>
+  <p class="tip">Firefox 风格 · HarmonyOS 原生 · v0.0.1 · 纯开源</p>
+</body>
+</html>
