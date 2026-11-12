@@ -1,0 +1,102 @@
+# NOTE: 本文件当前位于 .github/workflow/（构建时由 Agent 写入；.github/workflows/ 路径受写入策略限制）。
+# 启用 CI 前，请将本文件移动（rename）到 .github/workflows/release.yml。
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号（如 0.0.1）'
+        required: true
+        default: '0.0.1'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      VERSION: ${{ github.event.inputs.version || '0.0.1' }}
+      IS_RELEASE: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Get HarmonyOS command line tools
+        run: |
+          RELEASE_JSON=$(curl -s -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/harmonyos-dev/hos-sdk/releases/latest)
+          ASSET_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | test("commandline-tools-mac-2.0.0.2.zip")) | .browser_download_url')
+          echo "Asset URL: $ASSET_URL"
+          curl -LJO "$ASSET_URL"
+
+      - name: Unzip command line tools
+        run: unzip commandline-tools-mac-2.0.0.2.zip
+
+      - name: Install HarmonyOS SDK (API 9 toolchains)
+        run: |
+          # for handle Failed to request url https://devecostudio-dre.op.hicloud.com/sdkmanager/v5/hos/getSdkList
+          export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Duser.country=CN"
+          chmod +x command-line-tools/sdkmanager/bin/sdkmgr
+          command-line-tools/sdkmanager/bin/sdkmgr install toolchains:9 OpenHarmony/toolchains:9 --accept-license
+
+      - name: Decode icon resources
+        run: python3 scripts/prepare_assets.py
+
+      - name: Install hvigor
+        run: |
+          npm init -y
+          npm config set @ohos:registry=https://repo.harmonyos.com/npm/
+          npm install @ohos/hvigor@2.4.2 @ohos/hvigor-ohos-plugin@2.4.2
+
+      - name: Build unsigned hap
+        run: |
+          # for ERROR: Unable to find 'hwsdk.dir' in 'local.properties' or 'HOS_SDK_HOME' in the system environment path.
+          export HOS_SDK_HOME=$(pwd)/hwsdk
+          ./node_modules/.bin/hvigor --mode module -p product=default assembleHap --no-daemon
+
+      - name: Stage artifacts
+        run: |
+          mkdir -p dist
+          cp entry/build/default/outputs/default/entry-default-unsigned.hap dist/harmonyfox-${{ env.VERSION }}-unsigned.hap
+          zip -r dist/harmonyfox-${{ env.VERSION }}-source.zip . \
+            -x '.git/*' 'node_modules/*' 'build/*' '*/build/*' '.hvigor/*' 'oh_modules/*' '*/oh_modules/*' 'dist/*' 'command-line-tools/*' 'package.json' 'package-lock.json'
+          ls -lh dist
+
+      - name: Upload unsigned hap (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: harmonyfox-${{ env.VERSION }}-unsigned.hap
+          path: dist/harmonyfox-${{ env.VERSION }}-unsigned.hap
+
+      - name: Create GitHub Release
+        if: env.IS_RELEASE == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: HarmonyFox v${{ env.VERSION }}
+          prerelease: true
+          files: |
+            dist/harmonyfox-${{ env.VERSION }}-unsigned.hap
+            dist/harmonyfox-${{ env.VERSION }}-source.zip
+          body: |
+            HarmonyFox v${{ env.VERSION }}
+
+            - 底部工具栏（仿 Fenix）+ 顶部沉浸式时间栏
+            - ArkWeb 内核渲染
+            - **未签名 hap**：仅供开发者通过 hdc 在开启开发者模式的设备上调试安装
+            - 源码压缩包：完整工程源码
+
+            与 Mozilla / Firefox 无任何隶属关系。
