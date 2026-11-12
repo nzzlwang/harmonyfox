@@ -1,4 +1,5 @@
 {
+  "modelVersion": "6.0.0",
   "name": "harmonyfox",
   "version": "0.0.1",
   "description": "Firefox 风格的 HarmonyOS 原生浏览器（ArkTS + ArkWeb），纯开源",
