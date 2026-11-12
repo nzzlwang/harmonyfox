@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "HarmonyFox 浏览器主模块"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "HarmonyFox 浏览器"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "HarmonyFox"
+    }
+  ]
+}

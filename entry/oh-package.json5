@@ -1,0 +1,9 @@
+{
+  "name": "entry",
+  "version": "0.0.1",
+  "description": "HarmonyFox 浏览器主模块",
+  "main": "",
+  "author": "nzzlwang",
+  "license": "MPL-2.0",
+  "dependencies": {}
+}
