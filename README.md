@@ -11,6 +11,15 @@ Firefox 风格的 HarmonyOS 原生浏览器（ArkTS + ArkWeb），纯开源。
 - **ArkWeb 内核**：使用 HarmonyOS 系统 Web 内核渲染网页
 - **起始页**：内置深色起始页（rawfile/home.html），支持跳转搜索引擎
 
+## ⚠️ 启用 CI（重要，只需一次）
+
+工作流文件当前位于 [`.github/workflow/release.yml`](.github/workflow/release.yml)。由于自动化写入工具对 `.github/workflows/` 路径有写入限制，**请在网页端把它移动过去**：
+
+1. 打开 <https://github.com/nzzlwang/harmonyfox/blob/main/.github/workflow/release.yml>
+2. 点右上角 ✏️（Edit this file），把路径改为 `.github/workflows/release.yml`，提交。
+
+移动后推送到 `main` 会自动构建未签名 hap；发布 0.0.1 见下文。
+
 ## 目录结构
 
 ```
@@ -23,7 +32,7 @@ Firefox 风格的 HarmonyOS 原生浏览器（ArkTS + ArkWeb），纯开源。
 │       └── module.json5
 ├── assets/                  # 图标 base64 源文件
 ├── scripts/                 # gen_icon.py（PIL 生成图标）、prepare_assets.py（解码图标）
-├── .github/workflows/release.yml      # CI：构建未签名 hap + 发布 Release
+├── .github/workflow/release.yml       # CI 工作流（需移到 .github/workflows/ 下生效）
 └── build-profile.json5 / hvigorfile.ts / oh-package.json5
 ```
 
@@ -45,13 +54,12 @@ Firefox 风格的 HarmonyOS 原生浏览器（ArkTS + ArkWeb），纯开源。
 
 ## CI 云端构建（GitHub Actions）
 
-推送到 `main` 分支，或在 Actions 页面手动运行 `Release` 工作流（可输入版本号），将自动：
+启用 CI（见上文）后：
 
-1. 下载 HarmonyOS 命令行工具与 SDK（API 9 toolchain）
-2. 解码图标、安装 hvigor 2.4.2
-3. 构建未签名 hap：`entry-default-unsigned.hap`
-4. 打包源码 zip
-5. 创建/更新 Release（tag 为 `v<版本号>`），附 **未签名 hap + 源码压缩包**
+- **推送到 `main`**：自动构建未签名 hap 并上传为 Actions artifact。
+- **手动发布 Release**：在 Actions 页面运行 `Release` 工作流，输入版本号（默认 `0.0.1`），将自动构建并创建 Release（tag `v<版本号>`），附 **未签名 hap + 源码压缩包**。
+
+构建过程：下载 HarmonyOS 命令行工具与 SDK（API 9 toolchain）→ 解码图标 → 安装 hvigor 2.4.2 → `assembleHap`（无签名配置，产物为 unsigned hap）。
 
 ## 安装未签名 hap（开发者调试）
 
@@ -67,4 +75,4 @@ hdc install harmonyfox-0.0.1-unsigned.hap
 
 ## License
 
-MPL-2.0（与 Fenix 相同），见 [LICENSE](LICENSE）。
+MPL-2.0（与 Fenix 相同），见 [LICENSE](LICENSE)。
