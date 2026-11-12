@@ -1,0 +1,9 @@
+{
+  "name": "harmonyfox",
+  "version": "0.0.1",
+  "description": "Firefox 风格的 HarmonyOS 原生浏览器（ArkTS + ArkWeb），纯开源",
+  "main": "",
+  "author": "nzzlwang",
+  "license": "MPL-2.0",
+  "dependencies": {}
+}

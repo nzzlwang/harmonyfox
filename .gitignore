@@ -1,0 +1,11 @@
+/node_modules
+/build
+/.hvigor
+/oh_modules
+/local.properties
+/.idea
+/.cxx
+/dist
+/command-line-tools
+*.log
+.DS_Store

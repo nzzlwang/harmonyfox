@@ -1,0 +1,8 @@
+#!/bin/sh
+# HarmonyFox hvigor wrapper
+if [ ! -d node_modules/@ohos/hvigor ]; then
+  echo "Installing hvigor ..."
+  npm config set @ohos:registry=https://repo.harmonyos.com/npm/
+  npm install @ohos/hvigor@2.4.2 @ohos/hvigor-ohos-plugin@2.4.2
+fi
+exec ./node_modules/.bin/hvigor "$@"
